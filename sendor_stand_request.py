@@ -1,30 +1,27 @@
 #Ольга Дубинина, 20 кагорта-финальный проект. Инженер по тестированию плюс
+# Импорт настроек из модуля configuration, который содержит параметры конфигурации, такие как URL сервиса
 import configuration
+
+# Импорт библиотеки requests для выполнения HTTP-запросов
 import requests
+
+# Импорт данных запроса из модуля data, в котором определены заголовки и тело запроса
 import data
 
-# Создание заказа
-def create_order(body):
-    return requests.post (configuration.URL_SERVICE + configuration.CREAT_ORDERS,
+
+# Определение функции post_new_order для отправки POST-запроса на создание нового заказа
+def post_new_order(body):
+    # Выполнение POST-запроса с использованием URL из конфигурационного файла, тела запроса и заголовков
+    return requests.post(configuration.URL_SERVICE + configuration.CREATE_ORDER,
                          json=body)
 
-# Получение заказа по номеру трекера
-def get_order(track_number):
-    get_order_url = f"{configuration.URL_SERVICE}/api/v1/orders/track?t={track_number}"
-    response = requests.get(get_order_url)
-    return response
 
-# Автотест
-def test_order_creation_and_retrieval():
-    response = create_order(data.order_body)
+# Вызов функции post_new_user с телом запроса для создания нового пользователя из модуля data
 
-    track_number = response.json()["track"]
-    print("Заказ создан. Номер трека:", track_number)
+order_response = post_new_order(data.order_body)
 
-    # Получение данных заказа по треку
-    order_response = get_order(track_number)
 
-    assert order_response.status_code == 200, f"Ошибка: {order_response.status_code}"
-    order_data = order_response.json()
-    print("Данные заказа:")
-    print(order_data)
+# Запрос на получение заказа по треку заказа
+def get_order(track_order):
+    return requests.get(configuration.URL_SERVICE+configuration.PUT_ORDER,
+                        params=track_order)
